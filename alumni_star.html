@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alumni Star</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans|IBM+Plex+Sans+Condensed" rel="stylesheet">
+</head>
+
+<script>
+    // This code just replaces the redacted stuff with content from the lambda if it allows you to access it.
+    let xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('GET', 'https://vksriv7cr6.execute-api.us-east-1.amazonaws.com/Default');
+    xhr.send();
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            let json_text = xhr.response
+            document.getElementById("1").innerHTML = json_text["1"]
+            document.getElementById("2").innerHTML = json_text["2"]
+            document.getElementById("3").innerHTML = json_text["3"]
+
+            document.getElementById("1").className = "redacted_removed"
+            document.getElementById("2").className = "redacted_removed"
+            document.getElementById("3").className = "redacted_removed"
+        }
+    };
+</script>
+
+<!--
+
+Please note that while there are some "redacted" segments here, they are not actually confidential statements.
+
+I intend it to be a little tongue-in-cheek fun given the fact that I live in Virginia, not far from Washington, DC.
+I am using it simply because I don't want to reveal certain info the public, because that may reveal things such as
+current residential address, phone, and other information that I don't really want to share beyond the audience for
+this page, which is the students, faculty, and alumni of Clarkson University.
+
+The sections of code that are "redacted" are filled in with JavaScript from a Lambda behind an API Gateway that has
+a simple IP address filter on it. Pretty nifty, eh? Maybe I'll release the code sometime.
+
+https://en.wikipedia.org/wiki/Tongue-in-cheek
+
+This page Copyright © 2021 Jared Dunbar, All Rights Reserved.
+
+-->
+<body>
+    <div class="header">
+        <h1>Hello!</h1>
+        <p>
+            Welp, here's an Alumni * page. Never thought I'd make this, but hey.
+        </p>
+        <p class="indent" style="font-size: 24px">
+            [ <a href="index.html">Home Page</a> ]
+            [ <a href="https://github.com/jrddunbr/">GitHub</a> ]
+            [ <a href="https://mirror.vars.ja4.org">FOSS Mirror</a> ]
+        </p>
+        <p>
+            My name is Jared aka. jrddunbr aka. <span class="redacted" id="1">REDACTED</span>
+        </p>
+    </div>
+    <div class="content">
+        <h3>About me</h3>
+        <p class="indent">
+            I am a well-rounded software developer and systems engineer, with hobbies including
+            writing code in Kotlin, tinkering with IoT, hobbyist electronics projects,
+            <span class="redacted" id="2">REDACTED</span> , and model railroading.
+        </p>
+        <h3>Current Shenanigans</h3>
+        <ul>
+            <li>I work for Amazon Web Services as a Systems Engineer</li>
+            <li>I work on my homelab (a router, server, and basic network gear)</li>
+            <li>I work on various electronics projects including projects using the WDC 65C02, and various Arduino boards</li>
+            <li>I work with BASIC on the Commodore Pet 4016</li>
+            <li><span class="redacted" id="3">REDACTED</span></li>
+        </ul>
+        <h3>Previous Shenanigans</h3>
+        <p class="indent">
+            I was a systems administrator, network administrator, and generally a person who did all sorts of random
+            server room things between Fall 2015 and Spring 2019, regularly taking 2+ credits of MP* and notably
+            including the following various projects and accomplishments:
+        </p>
+        <ul>
+            <li>Setting up the new (at the time) TP Link managed switches with VLAN tags (spring 2017) </li>
+            <li>Arranging for the purchase of 10G fiber network hardware as part of an upgrade (spring 2017) </li>
+            <li>Getting the labs connected with 10G fiber to the rest of campus by working with OIT (fall 2017) </li>
+            <li>Rewired all the patch panels in the ITL and configured for a hackathon setting (fall 2018)</li>
+            <li>Coordinating with OIT to get COSI a rack in the Colo space (temperature controlled) (spring 2019) </li>
+            <li>Managing VM hosts and provisioning VM's and such </li>
+            <li>Maintaining the game server (GMx), voip server, docs, Gogs, Gitea, honeypots ... too many VM's to mention. </li>
+            <li>Worked with Bobby Newman to operate Ziltoid (the firewall) and Mirror. </li>
+            <li>Lots of relatively exhaustive documentation, network maps, design plans, late nights, etc.</li>
+            <li>Cleaned the labs more than once including extensive carpet cleaning (ask about Liquid Ass)</li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>
+            Copyright © 2021 Jared Dunbar
+            <br/>
+            All comments and opinions are solely mine, and not those of my employer.
+        </p>
+    </div>
+</body>
+</html>

@@ -45,16 +45,23 @@ a, a.visited {
 
 li {
   padding: 10px;
-}
-
-ul#links li {
-  display: inline;
+  list-style-type: square;
 }
 
 .code {
   font-family: 'IBM Plex Sans Mono', sans-serif;
   font-size: 20px;
   text-decoration: none;
+}
+
+.redacted {
+  color: black;
+  background-color: black;
+}
+
+.redacted_removed {
+  color: black;
+  background-color: #F2F2F2;
 }
 
 @media screen and (min-width: 650px) {
@@ -71,7 +78,7 @@ ul#links li {
 
 @media screen and (min-width: 1000px) {
   .content {
-    width: 650px;
+    width: 750px;
   }
   .footer {
     width: 550px;
