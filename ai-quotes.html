@@ -1,0 +1,297 @@
+<html lang="en_US">
+<head>
+    <title>
+        AI Quotes - ja4.org
+    </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans|IBM+Plex+Sans+Condensed" rel="stylesheet">
+</head>
+<body>
+<div class="header">
+    <h2>AI Quotes</h2>
+    <p class="indent" style="font-size: 24px">
+        [ <a href="index.html">home</a> ]
+        [ <a href="ai-quotes.md">source</a> ]
+    </p>
+</div>
+<div class="content ai-quotes-content">
+    <p class="indent">
+        A rotating collection of AI quotes in random order. Add new entries to
+        <a href="ai-quotes.md">ai-quotes.md</a>, separated by horizontal rules (<span class="code">---</span>)
+        with tags listed as <span class="code">Tags: code, rpg</span>.
+    </p>
+
+    <div class="tag-filter" aria-label="Filter quotes by tag">
+        <p class="tag-filter-label">Filter by tag:</p>
+        <div id="tag-filters" class="tag-filter-buttons"></div>
+    </div>
+
+    <section class="quote-rotator" aria-live="polite" aria-atomic="true">
+        <div class="quote-progress" aria-hidden="true">
+            <div id="quote-progress-bar" class="quote-progress-bar"></div>
+        </div>
+        <figure id="quote-card" class="quote-card">
+            <blockquote id="quote-text">
+                Loading quotes…
+            </blockquote>
+            <figcaption id="quote-source"></figcaption>
+            <div id="quote-tags" class="quote-tags" aria-label="Quote tags"></div>
+        </figure>
+        <div class="quote-controls">
+            <button type="button" id="previous-quote">Previous</button>
+            <button type="button" id="toggle-quotes">Pause</button>
+            <button type="button" id="next-quote">Next</button>
+        </div>
+        <p id="quote-status" class="quote-status"></p>
+    </section>
+</div>
+<div class="footer">
+    <p>
+        Copyright © 2026 Jared Dunbar
+        <br/>
+        All comments and opinions are solely mine, and not those of my current or prior employers.
+    </p>
+</div>
+<script>
+    const quotesSource = 'ai-quotes.md';
+    const wordsPerMinute = 220;
+    const minimumQuoteTime = 6000;
+    const maximumQuoteTime = 45000;
+    const readingBuffer = 2500;
+    const fallbackQuotes = [
+        {
+            text: 'It\'s like watching a freight car get isekai\'d - "That Time I Got Reincarnated as an Important Plot Device."',
+            source: '',
+            tags: ['humor', 'rpg', 'pop culture']
+        },
+        {
+            text: 'You take a bite, and it tastes like someone poured an entire bag of Skittles into a blender.',
+            source: '',
+            tags: ['humor', 'food']
+        },
+        {
+            text: 'That is exactly the kind of problem engineers overthink — and I support it.',
+            source: '',
+            tags: ['code', 'engineering', 'humor']
+        }
+    ];
+
+    const quoteText = document.getElementById('quote-text');
+    const quoteSource = document.getElementById('quote-source');
+    const quoteStatus = document.getElementById('quote-status');
+    const quoteTags = document.getElementById('quote-tags');
+    const tagFilters = document.getElementById('tag-filters');
+    const progressBar = document.getElementById('quote-progress-bar');
+    const previousButton = document.getElementById('previous-quote');
+    const toggleButton = document.getElementById('toggle-quotes');
+    const nextButton = document.getElementById('next-quote');
+
+    let quotes = fallbackQuotes;
+    let quoteQueue = [];
+    let currentQuote = 0;
+    let selectedTag = 'all';
+    let rotationTimer;
+    let isPaused = false;
+
+    function escapeHtml(value) {
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderInlineMarkdown(value) {
+        return escapeHtml(value)
+            .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/_([^_]+)_/g, '<em>$1</em>');
+    }
+
+    function splitQuoteSource(lines) {
+        const tagLineIndex = lines.findIndex((line) => /^tags:\s+/i.test(line.trim()));
+        const tags = tagLineIndex === -1 ? [] : lines[tagLineIndex]
+            .replace(/^tags:\s*/i, '')
+            .split(',')
+            .map((tag) => tag.trim().toLowerCase())
+            .filter(Boolean);
+        const quoteLines = tagLineIndex === -1 ? lines : lines.filter((_, index) => index !== tagLineIndex);
+        const sourceIndex = quoteLines.findIndex((line) => /^[-–—]\s+/.test(line.trim()));
+
+        if (sourceIndex === -1) {
+            return {
+                text: quoteLines.join('\n').trim(),
+                source: '',
+                tags
+            };
+        }
+
+        return {
+            text: quoteLines.slice(0, sourceIndex).join('\n').trim(),
+            source: quoteLines.slice(sourceIndex).join(' ').replace(/^[-–—]\s+/, '').trim(),
+            tags
+        };
+    }
+
+    function parseMarkdownQuotes(markdown) {
+        return markdown
+            .split(/^\s*---+\s*$/m)
+            .map((entry) => entry
+                .split('\n')
+                .map((line) => line.replace(/^>\s?/, '').trimEnd())
+                .filter((line) => line.trim() !== ''))
+            .filter((lines) => lines.length > 0)
+            .map(splitQuoteSource)
+            .filter((quote) => quote.text !== '');
+    }
+
+    function quoteReadingTime(quote) {
+        const words = `${quote.text} ${quote.source}`.trim().split(/\s+/).filter(Boolean).length;
+        const estimatedReadingTime = (words / wordsPerMinute) * 60 * 1000;
+        return Math.min(maximumQuoteTime, Math.max(minimumQuoteTime, estimatedReadingTime + readingBuffer));
+    }
+
+    function shuffleQuotes(values) {
+        const shuffled = [...values];
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+            const randomIndex = Math.floor(Math.random() * (index + 1));
+            [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+        }
+        return shuffled;
+    }
+
+    function matchingQuotes() {
+        if (selectedTag === 'all') {
+            return quotes;
+        }
+        return quotes.filter((quote) => (quote.tags || []).includes(selectedTag));
+    }
+
+    function buildQuoteQueue(avoidFirstQuote = null) {
+        quoteQueue = shuffleQuotes(matchingQuotes());
+        if (avoidFirstQuote && quoteQueue.length > 1 && quoteQueue[0] === avoidFirstQuote) {
+            const swapIndex = quoteQueue.findIndex((quote) => quote !== avoidFirstQuote);
+            [quoteQueue[0], quoteQueue[swapIndex]] = [quoteQueue[swapIndex], quoteQueue[0]];
+        }
+        currentQuote = 0;
+    }
+
+    function setProgressDuration(duration) {
+        progressBar.style.animation = 'none';
+        progressBar.offsetHeight;
+
+        if (!isPaused && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            progressBar.style.animation = `quote-progress ${duration}ms linear forwards`;
+        }
+    }
+
+    function renderTags(tags) {
+        quoteTags.innerHTML = tags
+            .map((tag) => `<button type="button" class="quote-tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`)
+            .join(' ');
+    }
+
+    function showQuote(index) {
+        if (quoteQueue.length === 0) {
+            quoteText.textContent = 'No quotes found for this tag.';
+            quoteSource.textContent = '';
+            quoteTags.innerHTML = '';
+            quoteStatus.textContent = '0 of 0';
+            clearTimeout(rotationTimer);
+            setProgressDuration(0);
+            return;
+        }
+
+        currentQuote = (index + quoteQueue.length) % quoteQueue.length;
+        const quote = quoteQueue[currentQuote];
+        const duration = quoteReadingTime(quote);
+        const filterLabel = selectedTag === 'all' ? 'all tags' : selectedTag;
+
+        quoteText.innerHTML = renderInlineMarkdown(quote.text).replace(/\n/g, '<br>');
+        quoteSource.innerHTML = quote.source ? `— ${renderInlineMarkdown(quote.source)}` : '';
+        renderTags(quote.tags || []);
+        quoteStatus.textContent = `${currentQuote + 1} of ${quoteQueue.length} · ${filterLabel} · ${Math.round(duration / 1000)} seconds`;
+        setProgressDuration(duration);
+
+        clearTimeout(rotationTimer);
+        if (!isPaused && quoteQueue.length > 1) {
+            rotationTimer = setTimeout(showNextQuote, duration);
+        }
+    }
+
+    function showNextQuote() {
+        if (currentQuote === quoteQueue.length - 1) {
+            buildQuoteQueue(quoteQueue[currentQuote]);
+            showQuote(0);
+            return;
+        }
+        showQuote(currentQuote + 1);
+    }
+
+    function toggleRotation() {
+        isPaused = !isPaused;
+        toggleButton.textContent = isPaused ? 'Resume' : 'Pause';
+        toggleButton.setAttribute('aria-pressed', isPaused.toString());
+        showQuote(currentQuote);
+    }
+
+    function renderTagFilters() {
+        const tags = [...new Set(quotes.flatMap((quote) => quote.tags || []))].sort();
+        tagFilters.innerHTML = ['all', ...tags]
+            .map((tag) => `<button type="button" class="tag-filter-button" data-tag="${escapeHtml(tag)}" aria-pressed="${(tag === selectedTag).toString()}">${escapeHtml(tag)}</button>`)
+            .join(' ');
+    }
+
+    previousButton.addEventListener('click', () => showQuote(currentQuote - 1));
+    nextButton.addEventListener('click', showNextQuote);
+    toggleButton.addEventListener('click', toggleRotation);
+    tagFilters.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-tag]');
+        if (!button) {
+            return;
+        }
+        selectedTag = button.dataset.tag;
+        renderTagFilters();
+        buildQuoteQueue();
+        showQuote(0);
+    });
+    quoteTags.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-tag]');
+        if (!button) {
+            return;
+        }
+        selectedTag = button.dataset.tag;
+        renderTagFilters();
+        buildQuoteQueue();
+        showQuote(0);
+    });
+
+    fetch(quotesSource)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Unable to load ${quotesSource}`);
+            }
+            return response.text();
+        })
+        .then((markdown) => {
+            const parsedQuotes = parseMarkdownQuotes(markdown);
+            if (parsedQuotes.length > 0) {
+                quotes = parsedQuotes;
+            }
+            renderTagFilters();
+            buildQuoteQueue();
+            showQuote(0);
+        })
+        .catch(() => {
+            renderTagFilters();
+            buildQuoteQueue();
+            showQuote(0);
+        });
+
+</script>
+</body>
+</html>

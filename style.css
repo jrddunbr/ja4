@@ -88,3 +88,142 @@ li {
         margin-left: 20px;
     }
 }
+
+.ai-quotes-content {
+    max-width: 900px;
+}
+
+.quote-rotator {
+    margin: 40px 0;
+}
+
+.quote-progress {
+    height: 4px;
+    width: 100%;
+    background-color: #E6E6E6;
+    overflow: hidden;
+}
+
+.quote-progress-bar {
+    height: 100%;
+    width: 0;
+    background-color: #0044AA;
+}
+
+.quote-card {
+    margin: 0;
+    padding: 32px;
+    border-left: 6px solid #0044AA;
+    background-color: #F8F8F8;
+}
+
+.quote-card blockquote {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.35;
+}
+
+.quote-card figcaption {
+    margin-top: 24px;
+    color: #555555;
+    font-size: 22px;
+}
+
+.quote-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.quote-controls button {
+    border: 2px solid #0044AA;
+    background-color: white;
+    color: #0044AA;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 18px;
+    padding: 8px 14px;
+}
+
+.quote-controls button:hover,
+.quote-controls button:focus {
+    background-color: #0044AA;
+    color: white;
+}
+
+.quote-status {
+    color: #555555;
+    font-size: 16px;
+}
+
+@keyframes quote-progress {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 650px) {
+    .quote-card {
+        padding: 22px;
+    }
+
+    .quote-card blockquote {
+        font-size: 26px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quote-progress-bar {
+        animation: none !important;
+    }
+}
+
+.tag-filter {
+    margin: 24px 10px 0;
+}
+
+.tag-filter-label {
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.tag-filter-buttons,
+.quote-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-filter-button,
+.quote-tag {
+    border: 1px solid #0044AA;
+    border-radius: 999px;
+    background-color: white;
+    color: #0044AA;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    padding: 5px 10px;
+}
+
+.tag-filter-button:hover,
+.tag-filter-button:focus,
+.tag-filter-button[aria-pressed="true"],
+.quote-tag:hover,
+.quote-tag:focus {
+    background-color: #0044AA;
+    color: white;
+}
+
+.quote-tags {
+    margin-top: 22px;
+}
+
+.quote-tag {
+    font-size: 14px;
+}
