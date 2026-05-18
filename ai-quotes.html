@@ -1,0 +1,187 @@
+<html lang="en_US">
+<head>
+    <title>
+        AI Quotes - ja4.org
+    </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans|IBM+Plex+Sans+Condensed" rel="stylesheet">
+</head>
+<body>
+<div class="header">
+    <h2>AI Quotes</h2>
+    <p class="indent" style="font-size: 24px">
+        [ <a href="index.html">home</a> ]
+        [ <a href="ai-quotes.md">source</a> ]
+    </p>
+</div>
+<div class="content ai-quotes-content">
+    <p class="indent">
+        A rotating collection of AI quotes. Add new entries to
+        <a href="ai-quotes.md">ai-quotes.md</a>, separated by horizontal rules (<span class="code">---</span>).
+    </p>
+
+    <section class="quote-rotator" aria-live="polite" aria-atomic="true">
+        <div class="quote-progress" aria-hidden="true">
+            <div id="quote-progress-bar" class="quote-progress-bar"></div>
+        </div>
+        <figure id="quote-card" class="quote-card">
+            <blockquote id="quote-text">
+                Loading quotes…
+            </blockquote>
+            <figcaption id="quote-source"></figcaption>
+        </figure>
+        <div class="quote-controls">
+            <button type="button" id="previous-quote">Previous</button>
+            <button type="button" id="toggle-quotes">Pause</button>
+            <button type="button" id="next-quote">Next</button>
+        </div>
+        <p id="quote-status" class="quote-status"></p>
+    </section>
+</div>
+<div class="footer">
+    <p>
+        Copyright © 2026 Jared Dunbar
+        <br/>
+        All comments and opinions are solely mine, and not those of my current or prior employers.
+    </p>
+</div>
+<script>
+    const quotesSource = 'ai-quotes.md';
+    const wordsPerMinute = 220;
+    const minimumQuoteTime = 6000;
+    const maximumQuoteTime = 45000;
+    const readingBuffer = 2500;
+    const fallbackQuotes = [
+        {
+            text: 'It\'s like watching a freight car get isekai\'d - "That Time I Got Reincarnated as an Important Plot Device."',
+            source: ''
+        },
+        {
+            text: 'You take a bite, and it tastes like someone poured an entire bag of Skittles into a blender.',
+            source: ''
+        },
+        {
+            text: 'That is exactly the kind of problem engineers overthink — and I support it.',
+            source: ''
+        }
+    ];
+
+    const quoteText = document.getElementById('quote-text');
+    const quoteSource = document.getElementById('quote-source');
+    const quoteStatus = document.getElementById('quote-status');
+    const progressBar = document.getElementById('quote-progress-bar');
+    const previousButton = document.getElementById('previous-quote');
+    const toggleButton = document.getElementById('toggle-quotes');
+    const nextButton = document.getElementById('next-quote');
+
+    let quotes = fallbackQuotes;
+    let currentQuote = 0;
+    let rotationTimer;
+    let isPaused = false;
+
+    function escapeHtml(value) {
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderInlineMarkdown(value) {
+        return escapeHtml(value)
+            .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    }
+
+    function splitQuoteSource(lines) {
+        const sourceIndex = lines.findIndex((line) => /^[-–—]\s+/.test(line.trim()));
+
+        if (sourceIndex === -1) {
+            return {
+                text: lines.join('\n').trim(),
+                source: ''
+            };
+        }
+
+        return {
+            text: lines.slice(0, sourceIndex).join('\n').trim(),
+            source: lines.slice(sourceIndex).join(' ').replace(/^[-–—]\s+/, '').trim()
+        };
+    }
+
+    function parseMarkdownQuotes(markdown) {
+        return markdown
+            .split(/^\s*---+\s*$/m)
+            .map((entry) => entry
+                .split('\n')
+                .map((line) => line.replace(/^>\s?/, '').trimEnd())
+                .filter((line) => line.trim() !== ''))
+            .filter((lines) => lines.length > 0)
+            .map(splitQuoteSource)
+            .filter((quote) => quote.text !== '');
+    }
+
+    function quoteReadingTime(quote) {
+        const words = `${quote.text} ${quote.source}`.trim().split(/\s+/).filter(Boolean).length;
+        const estimatedReadingTime = (words / wordsPerMinute) * 60 * 1000;
+        return Math.min(maximumQuoteTime, Math.max(minimumQuoteTime, estimatedReadingTime + readingBuffer));
+    }
+
+    function setProgressDuration(duration) {
+        progressBar.style.animation = 'none';
+        progressBar.offsetHeight;
+
+        if (!isPaused && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            progressBar.style.animation = `quote-progress ${duration}ms linear forwards`;
+        }
+    }
+
+    function showQuote(index) {
+        currentQuote = (index + quotes.length) % quotes.length;
+        const quote = quotes[currentQuote];
+        const duration = quoteReadingTime(quote);
+
+        quoteText.innerHTML = renderInlineMarkdown(quote.text).replace(/\n/g, '<br>');
+        quoteSource.innerHTML = quote.source ? `— ${renderInlineMarkdown(quote.source)}` : '';
+        quoteStatus.textContent = `${currentQuote + 1} of ${quotes.length} · ${Math.round(duration / 1000)} seconds`;
+        setProgressDuration(duration);
+
+        clearTimeout(rotationTimer);
+        if (!isPaused && quotes.length > 1) {
+            rotationTimer = setTimeout(() => showQuote(currentQuote + 1), duration);
+        }
+    }
+
+    function toggleRotation() {
+        isPaused = !isPaused;
+        toggleButton.textContent = isPaused ? 'Resume' : 'Pause';
+        toggleButton.setAttribute('aria-pressed', isPaused.toString());
+        showQuote(currentQuote);
+    }
+
+    previousButton.addEventListener('click', () => showQuote(currentQuote - 1));
+    nextButton.addEventListener('click', () => showQuote(currentQuote + 1));
+    toggleButton.addEventListener('click', toggleRotation);
+
+    fetch(quotesSource)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Unable to load ${quotesSource}`);
+            }
+            return response.text();
+        })
+        .then((markdown) => {
+            const parsedQuotes = parseMarkdownQuotes(markdown);
+            if (parsedQuotes.length > 0) {
+                quotes = parsedQuotes;
+            }
+            showQuote(0);
+        })
+        .catch(() => showQuote(0));
+</script>
+</body>
+</html>
