@@ -103,3 +103,11 @@ All I wanted to know is what the size of the motor controller was, and instead I
 Apparently, "No" is a trending feature for this product on Amazon's website.
 
 ![](assets/IMG_8176.png)
+
+---
+
+Opening Firefox directly from Wayland Gnome 3 works perfectly fine. However, if you start Discord and then click a link that opens a new Firefox browser window, the keyboard will not function ONLY in Firefox's URL bar until you force Discord to use Wayland instead of X11 by editing the .desktop file.
+
+---
+
+You can use xeyes to find out whether applications are using X11 instead of Wayland. If the eyes move, you're using a program rendering via X11.

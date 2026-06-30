@@ -70,8 +70,11 @@
 
     let features = fallbackFeatures;
     let currentFeature = 0;
+    let featureOrder = [];
+    let featureOrderPosition = 0;
     let rotationTimer;
     let isPaused = false;
+    let isPinned = false;
 
     function escapeHtml(value) {
         return value
@@ -169,37 +172,116 @@
         progressBar.style.animation = 'none';
         progressBar.offsetHeight;
 
-        if (!isPaused && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (!isPaused && !isPinned && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             progressBar.style.animation = `quote-progress ${duration}ms linear forwards`;
         }
     }
 
-    function showFeature(index) {
+    function shuffleFeatureOrder() {
+        featureOrder = features.map((feature, index) => index);
+
+        for (let index = featureOrder.length - 1; index > 0; index -= 1) {
+            const randomIndex = Math.floor(Math.random() * (index + 1));
+            [featureOrder[index], featureOrder[randomIndex]] = [featureOrder[randomIndex], featureOrder[index]];
+        }
+
+        featureOrderPosition = 0;
+    }
+
+    function showFeature(index, scheduleNext = true) {
         currentFeature = (index + features.length) % features.length;
         const feature = features[currentFeature];
         const duration = featureReadingTime(feature);
 
         featureText.innerHTML = renderMarkdown(feature.text);
         featureSource.innerHTML = feature.source ? `— ${renderInlineMarkdown(feature.source)}` : '';
-        featureStatus.textContent = `${currentFeature + 1} of ${features.length} · ${Math.round(duration / 1000)} seconds`;
+        featureStatus.innerHTML = isPinned
+            ? `<a href="#feature=${currentFeature + 1}">${currentFeature + 1}</a> of ${features.length} - pinned`
+            : `<a href="#feature=${currentFeature + 1}">${currentFeature + 1}</a> of ${features.length} - ${Math.round(duration / 1000)} seconds`;
         setProgressDuration(duration);
 
         clearTimeout(rotationTimer);
-        if (!isPaused && features.length > 1) {
-            rotationTimer = setTimeout(() => showFeature(currentFeature + 1), duration);
+        if (scheduleNext && !isPinned && !isPaused && features.length > 1) {
+            rotationTimer = setTimeout(showNextFeature, duration);
         }
     }
 
+    function showOrderedFeature(position) {
+        if (featureOrder.length === 0) {
+            shuffleFeatureOrder();
+        }
+
+        if (position >= featureOrder.length) {
+            const previousFeature = currentFeature;
+            shuffleFeatureOrder();
+
+            if (features.length > 1 && featureOrder[0] === previousFeature) {
+                const swapIndex = featureOrder.findIndex((featureIndex) => featureIndex !== previousFeature);
+                [featureOrder[0], featureOrder[swapIndex]] = [featureOrder[swapIndex], featureOrder[0]];
+            }
+        } else if (position < 0) {
+            shuffleFeatureOrder();
+            featureOrderPosition = featureOrder.length - 1;
+        } else {
+            featureOrderPosition = position;
+        }
+
+        showFeature(featureOrder[featureOrderPosition]);
+    }
+
+    function showPreviousFeature() {
+        showOrderedFeature(featureOrderPosition - 1);
+    }
+
+    function showNextFeature() {
+        showOrderedFeature(featureOrderPosition + 1);
+    }
+
     function toggleRotation() {
+        if (isPinned) {
+            return;
+        }
+
         isPaused = !isPaused;
         toggleButton.textContent = isPaused ? 'Resume' : 'Pause';
         toggleButton.setAttribute('aria-pressed', isPaused.toString());
         showFeature(currentFeature);
     }
 
-    previousButton.addEventListener('click', () => showFeature(currentFeature - 1));
-    nextButton.addEventListener('click', () => showFeature(currentFeature + 1));
+    function pinnedFeatureIndex() {
+        const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        const featureNumber = Number.parseInt(params.get('feature') || params.get('quote'), 10);
+
+        if (Number.isInteger(featureNumber) && featureNumber >= 1 && featureNumber <= features.length) {
+            return featureNumber - 1;
+        }
+
+        return null;
+    }
+
+    function showInitialFeature() {
+        const pinnedIndex = pinnedFeatureIndex();
+        isPinned = pinnedIndex !== null;
+        isPaused = false;
+        previousButton.disabled = isPinned;
+        nextButton.disabled = isPinned;
+        toggleButton.disabled = isPinned;
+        toggleButton.textContent = isPinned ? 'Pinned' : 'Pause';
+        toggleButton.setAttribute('aria-pressed', 'false');
+
+        if (isPinned) {
+            showFeature(pinnedIndex, false);
+            return;
+        }
+
+        shuffleFeatureOrder();
+        showOrderedFeature(0);
+    }
+
+    previousButton.addEventListener('click', showPreviousFeature);
+    nextButton.addEventListener('click', showNextFeature);
     toggleButton.addEventListener('click', toggleRotation);
+    window.addEventListener('hashchange', showInitialFeature);
 
     fetch(featuresSource)
         .then((response) => {
@@ -213,9 +295,9 @@
             if (parsedFeatures.length > 0) {
                 features = parsedFeatures;
             }
-            showFeature(0);
+            showInitialFeature();
         })
-        .catch(() => showFeature(0));
+        .catch(showInitialFeature);
 </script>
 </body>
 </html>

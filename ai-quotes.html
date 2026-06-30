@@ -78,8 +78,11 @@
 
     let quotes = fallbackQuotes;
     let currentQuote = 0;
+    let quoteOrder = [];
+    let quoteOrderPosition = 0;
     let rotationTimer;
     let isPaused = false;
+    let isPinned = false;
 
     function escapeHtml(value) {
         return value
@@ -177,37 +180,116 @@
         progressBar.style.animation = 'none';
         progressBar.offsetHeight;
 
-        if (!isPaused && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (!isPaused && !isPinned && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             progressBar.style.animation = `quote-progress ${duration}ms linear forwards`;
         }
     }
 
-    function showQuote(index) {
+    function shuffleQuoteOrder() {
+        quoteOrder = quotes.map((quote, index) => index);
+
+        for (let index = quoteOrder.length - 1; index > 0; index -= 1) {
+            const randomIndex = Math.floor(Math.random() * (index + 1));
+            [quoteOrder[index], quoteOrder[randomIndex]] = [quoteOrder[randomIndex], quoteOrder[index]];
+        }
+
+        quoteOrderPosition = 0;
+    }
+
+    function showQuote(index, scheduleNext = true) {
         currentQuote = (index + quotes.length) % quotes.length;
         const quote = quotes[currentQuote];
         const duration = quoteReadingTime(quote);
 
         quoteText.innerHTML = renderMarkdown(quote.text);
         quoteSource.innerHTML = quote.source ? `— ${renderInlineMarkdown(quote.source)}` : '';
-        quoteStatus.textContent = `${currentQuote + 1} of ${quotes.length} · ${Math.round(duration / 1000)} seconds`;
+        quoteStatus.innerHTML = isPinned
+            ? `<a href="#quote=${currentQuote + 1}">${currentQuote + 1}</a> of ${quotes.length} - pinned`
+            : `<a href="#quote=${currentQuote + 1}">${currentQuote + 1}</a> of ${quotes.length} - ${Math.round(duration / 1000)} seconds`;
         setProgressDuration(duration);
 
         clearTimeout(rotationTimer);
-        if (!isPaused && quotes.length > 1) {
-            rotationTimer = setTimeout(() => showQuote(currentQuote + 1), duration);
+        if (scheduleNext && !isPinned && !isPaused && quotes.length > 1) {
+            rotationTimer = setTimeout(showNextQuote, duration);
         }
     }
 
+    function showOrderedQuote(position) {
+        if (quoteOrder.length === 0) {
+            shuffleQuoteOrder();
+        }
+
+        if (position >= quoteOrder.length) {
+            const previousQuote = currentQuote;
+            shuffleQuoteOrder();
+
+            if (quotes.length > 1 && quoteOrder[0] === previousQuote) {
+                const swapIndex = quoteOrder.findIndex((quoteIndex) => quoteIndex !== previousQuote);
+                [quoteOrder[0], quoteOrder[swapIndex]] = [quoteOrder[swapIndex], quoteOrder[0]];
+            }
+        } else if (position < 0) {
+            shuffleQuoteOrder();
+            quoteOrderPosition = quoteOrder.length - 1;
+        } else {
+            quoteOrderPosition = position;
+        }
+
+        showQuote(quoteOrder[quoteOrderPosition]);
+    }
+
+    function showPreviousQuote() {
+        showOrderedQuote(quoteOrderPosition - 1);
+    }
+
+    function showNextQuote() {
+        showOrderedQuote(quoteOrderPosition + 1);
+    }
+
     function toggleRotation() {
+        if (isPinned) {
+            return;
+        }
+
         isPaused = !isPaused;
         toggleButton.textContent = isPaused ? 'Resume' : 'Pause';
         toggleButton.setAttribute('aria-pressed', isPaused.toString());
         showQuote(currentQuote);
     }
 
-    previousButton.addEventListener('click', () => showQuote(currentQuote - 1));
-    nextButton.addEventListener('click', () => showQuote(currentQuote + 1));
+    function pinnedQuoteIndex() {
+        const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        const quoteNumber = Number.parseInt(params.get('quote'), 10);
+
+        if (Number.isInteger(quoteNumber) && quoteNumber >= 1 && quoteNumber <= quotes.length) {
+            return quoteNumber - 1;
+        }
+
+        return null;
+    }
+
+    function showInitialQuote() {
+        const pinnedIndex = pinnedQuoteIndex();
+        isPinned = pinnedIndex !== null;
+        isPaused = false;
+        previousButton.disabled = isPinned;
+        nextButton.disabled = isPinned;
+        toggleButton.disabled = isPinned;
+        toggleButton.textContent = isPinned ? 'Pinned' : 'Pause';
+        toggleButton.setAttribute('aria-pressed', 'false');
+
+        if (isPinned) {
+            showQuote(pinnedIndex, false);
+            return;
+        }
+
+        shuffleQuoteOrder();
+        showOrderedQuote(0);
+    }
+
+    previousButton.addEventListener('click', showPreviousQuote);
+    nextButton.addEventListener('click', showNextQuote);
     toggleButton.addEventListener('click', toggleRotation);
+    window.addEventListener('hashchange', showInitialQuote);
 
     fetch(quotesSource)
         .then((response) => {
@@ -221,9 +303,9 @@
             if (parsedQuotes.length > 0) {
                 quotes = parsedQuotes;
             }
-            showQuote(0);
+            showInitialQuote();
         })
-        .catch(() => showQuote(0));
+        .catch(showInitialQuote);
 </script>
 </body>
 </html>
