@@ -1,7 +1,7 @@
 <html lang="en_US">
 <head>
     <title>
-        AI Quotes - ja4.org
+        Feature Tracker - ja4.org
     </title>
     <link rel="stylesheet" type="text/css" href="style.css?v=20260629">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,7 @@
 </head>
 <body>
 <div class="header">
-    <h2>AI Quotes</h2>
+    <h2>Feature Tracker</h2>
     <p class="indent" style="font-size: 24px">
         [ <a href="index.html">home</a> ]
         [ <a target="_blank" rel="noopener noreferrer" href="https://github.com/jrddunbr/ja4">source</a> ]
@@ -18,26 +18,26 @@
 </div>
 <div class="content ai-quotes-content">
     <p class="indent">
-        A rotating collection of AI quotes. Add new entries to
-        <a target="_blank" rel="noopener noreferrer" href="https://github.com/jrddunbr/ja4/blob/main/ai-quotes.md">ai-quotes.md</a>, separated by horizontal rules (<span class="code">---</span>).
+        A rotating collection of feature tracker entries. Add new entries to
+        <a target="_blank" rel="noopener noreferrer" href="https://github.com/jrddunbr/ja4/blob/main/feature-tracker.md">feature-tracker.md</a>, separated by horizontal rules (<span class="code">---</span>).
     </p>
 
     <section class="quote-rotator" aria-live="polite" aria-atomic="true">
         <div class="quote-progress" aria-hidden="true">
-            <div id="quote-progress-bar" class="quote-progress-bar"></div>
+            <div id="feature-progress-bar" class="quote-progress-bar"></div>
         </div>
-        <figure id="quote-card" class="quote-card">
-            <blockquote id="quote-text">
-                Loading quotes…
+        <figure id="feature-card" class="quote-card">
+            <blockquote id="feature-text">
+                Loading features...
             </blockquote>
-            <figcaption id="quote-source"></figcaption>
+            <figcaption id="feature-source"></figcaption>
         </figure>
         <div class="quote-controls">
-            <button type="button" id="previous-quote">Previous</button>
-            <button type="button" id="toggle-quotes">Pause</button>
-            <button type="button" id="next-quote">Next</button>
+            <button type="button" id="previous-feature">Previous</button>
+            <button type="button" id="toggle-features">Pause</button>
+            <button type="button" id="next-feature">Next</button>
         </div>
-        <p id="quote-status" class="quote-status"></p>
+        <p id="feature-status" class="quote-status"></p>
     </section>
 </div>
 <div class="footer">
@@ -48,36 +48,28 @@
     </p>
 </div>
 <script>
-    const quotesSource = 'ai-quotes.md';
+    const featuresSource = 'feature-tracker.md';
     const wordsPerMinute = 220;
-    const minimumQuoteTime = 6000;
-    const maximumQuoteTime = 45000;
+    const minimumFeatureTime = 6000;
+    const maximumFeatureTime = 45000;
     const readingBuffer = 2500;
-    const fallbackQuotes = [
+    const fallbackFeatures = [
         {
-            text: 'It\'s like watching a freight car get isekai\'d - "That Time I Got Reincarnated as an Important Plot Device."',
-            source: ''
-        },
-        {
-            text: 'You take a bite, and it tastes like someone poured an entire bag of Skittles into a blender.',
-            source: ''
-        },
-        {
-            text: 'That is exactly the kind of problem engineers overthink — and I support it.',
+            text: 'On common math websites, Firefox asks me if I want to translate the page from Greek to English',
             source: ''
         }
     ];
 
-    const quoteText = document.getElementById('quote-text');
-    const quoteSource = document.getElementById('quote-source');
-    const quoteStatus = document.getElementById('quote-status');
-    const progressBar = document.getElementById('quote-progress-bar');
-    const previousButton = document.getElementById('previous-quote');
-    const toggleButton = document.getElementById('toggle-quotes');
-    const nextButton = document.getElementById('next-quote');
+    const featureText = document.getElementById('feature-text');
+    const featureSource = document.getElementById('feature-source');
+    const featureStatus = document.getElementById('feature-status');
+    const progressBar = document.getElementById('feature-progress-bar');
+    const previousButton = document.getElementById('previous-feature');
+    const toggleButton = document.getElementById('toggle-features');
+    const nextButton = document.getElementById('next-feature');
 
-    let quotes = fallbackQuotes;
-    let currentQuote = 0;
+    let features = fallbackFeatures;
+    let currentFeature = 0;
     let rotationTimer;
     let isPaused = false;
 
@@ -138,7 +130,7 @@
         return rendered.join('<br>');
     }
 
-    function splitQuoteSource(lines) {
+    function splitFeatureSource(lines) {
         const sourceIndex = lines.findIndex((line) => /^[-–—]\s+/.test(line.trim()));
 
         if (sourceIndex === -1) {
@@ -154,7 +146,7 @@
         };
     }
 
-    function parseMarkdownQuotes(markdown) {
+    function parseMarkdownFeatures(markdown) {
         return markdown
             .split(/^\s*---+\s*$/m)
             .map((entry) => entry
@@ -162,14 +154,14 @@
                 .map((line) => line.replace(/^>\s?/, '').trimEnd())
                 .filter((line) => line.trim() !== ''))
             .filter((lines) => lines.length > 0)
-            .map(splitQuoteSource)
-            .filter((quote) => quote.text !== '');
+            .map(splitFeatureSource)
+            .filter((feature) => feature.text !== '');
     }
 
-    function quoteReadingTime(quote) {
-        const words = `${quote.text} ${quote.source}`.trim().split(/\s+/).filter(Boolean).length;
+    function featureReadingTime(feature) {
+        const words = `${feature.text} ${feature.source}`.trim().split(/\s+/).filter(Boolean).length;
         const estimatedReadingTime = (words / wordsPerMinute) * 60 * 1000;
-        return Math.min(maximumQuoteTime, Math.max(minimumQuoteTime, estimatedReadingTime + readingBuffer));
+        return Math.min(maximumFeatureTime, Math.max(minimumFeatureTime, estimatedReadingTime + readingBuffer));
     }
 
     function setProgressDuration(duration) {
@@ -181,19 +173,19 @@
         }
     }
 
-    function showQuote(index) {
-        currentQuote = (index + quotes.length) % quotes.length;
-        const quote = quotes[currentQuote];
-        const duration = quoteReadingTime(quote);
+    function showFeature(index) {
+        currentFeature = (index + features.length) % features.length;
+        const feature = features[currentFeature];
+        const duration = featureReadingTime(feature);
 
-        quoteText.innerHTML = renderMarkdown(quote.text);
-        quoteSource.innerHTML = quote.source ? `— ${renderInlineMarkdown(quote.source)}` : '';
-        quoteStatus.textContent = `${currentQuote + 1} of ${quotes.length} · ${Math.round(duration / 1000)} seconds`;
+        featureText.innerHTML = renderMarkdown(feature.text);
+        featureSource.innerHTML = feature.source ? `— ${renderInlineMarkdown(feature.source)}` : '';
+        featureStatus.textContent = `${currentFeature + 1} of ${features.length} · ${Math.round(duration / 1000)} seconds`;
         setProgressDuration(duration);
 
         clearTimeout(rotationTimer);
-        if (!isPaused && quotes.length > 1) {
-            rotationTimer = setTimeout(() => showQuote(currentQuote + 1), duration);
+        if (!isPaused && features.length > 1) {
+            rotationTimer = setTimeout(() => showFeature(currentFeature + 1), duration);
         }
     }
 
@@ -201,28 +193,28 @@
         isPaused = !isPaused;
         toggleButton.textContent = isPaused ? 'Resume' : 'Pause';
         toggleButton.setAttribute('aria-pressed', isPaused.toString());
-        showQuote(currentQuote);
+        showFeature(currentFeature);
     }
 
-    previousButton.addEventListener('click', () => showQuote(currentQuote - 1));
-    nextButton.addEventListener('click', () => showQuote(currentQuote + 1));
+    previousButton.addEventListener('click', () => showFeature(currentFeature - 1));
+    nextButton.addEventListener('click', () => showFeature(currentFeature + 1));
     toggleButton.addEventListener('click', toggleRotation);
 
-    fetch(quotesSource)
+    fetch(featuresSource)
         .then((response) => {
             if (!response.ok) {
-                throw new Error(`Unable to load ${quotesSource}`);
+                throw new Error(`Unable to load ${featuresSource}`);
             }
             return response.text();
         })
         .then((markdown) => {
-            const parsedQuotes = parseMarkdownQuotes(markdown);
-            if (parsedQuotes.length > 0) {
-                quotes = parsedQuotes;
+            const parsedFeatures = parseMarkdownFeatures(markdown);
+            if (parsedFeatures.length > 0) {
+                features = parsedFeatures;
             }
-            showQuote(0);
+            showFeature(0);
         })
-        .catch(() => showQuote(0));
+        .catch(() => showFeature(0));
 </script>
 </body>
 </html>

@@ -112,15 +112,60 @@ li {
 
 .quote-card {
     margin: 0;
+    overflow: hidden;
     padding: 32px;
     border-left: 6px solid #0044AA;
     background-color: #F8F8F8;
 }
 
 .quote-card blockquote {
-    margin: 0;
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 100%;
     font-size: 32px;
     line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.quote-card code {
+    background-color: #EDEDED;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82em;
+    padding: 0 0.2em;
+}
+
+.quote-card pre {
+    background-color: #EDEDED;
+    font-size: 18px;
+    line-height: 1.45;
+    margin: 20px 0 0;
+    overflow-x: auto;
+    padding: 16px;
+}
+
+.quote-card pre code {
+    background-color: transparent;
+    display: block;
+    padding: 0;
+}
+
+.quote-image {
+    align-items: flex-start;
+    display: flex;
+    justify-content: center;
+    margin: 20px auto 0;
+    max-height: min(55vh, 24rem);
+    max-width: 100%;
+    width: 100%;
+}
+
+.quote-card img {
+    display: block;
+    height: auto;
+    max-height: min(55vh, 24rem);
+    max-width: 100%;
+    object-fit: contain;
+    width: auto;
 }
 
 .quote-card figcaption {
