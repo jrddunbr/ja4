@@ -62,7 +62,7 @@ You can now test a VAC ban against yourself by running CS:GO in a VM!
 
 ---
 
-Running memtest on particular laptops is a fantastic non-obvious way to self-destruct your laptop! https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=900399
+Running memtest on particular laptops is a fantastic non-obvious way to [self-destruct your laptop](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=900399)!
 
 ---
 
@@ -78,7 +78,7 @@ If you ever want to test your hardware debugging skills, get an Opteron 6376, an
 
 ---
 
-VLC "Santa Hat" icon, displayed Dec. 24 through Jan. 1, now comes with a disable checkbox so you can [https://techdows.com/2012/12/remove-santa-hat-vlc-player.html#comment-21449 find it on a high-DPI display]
+VLC "Santa Hat" icon, displayed Dec. 24 through Jan. 1, now comes with a disable checkbox so you can [find it on a high-DPI display](https://techdows.com/2012/12/remove-santa-hat-vlc-player.html#comment-21449)
 
 ---
 
