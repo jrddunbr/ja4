@@ -1,0 +1,98 @@
+[
+  {
+    "id": "east",
+    "name": "East",
+    "short_name": "EAST",
+    "file": "east.geojson"
+  },
+  {
+    "id": "me",
+    "name": "Maine",
+    "short_name": "ME",
+    "file": "me.geojson"
+  },
+  {
+    "id": "nh",
+    "name": "New Hampshire",
+    "short_name": "NH",
+    "file": "nh.geojson"
+  },
+  {
+    "id": "vt",
+    "name": "Vermont",
+    "short_name": "VT",
+    "file": "vt.geojson"
+  },
+  {
+    "id": "bos",
+    "name": "Boston / Eastern Massachusetts",
+    "short_name": "BOS",
+    "file": "bos.geojson"
+  },
+  {
+    "id": "pv",
+    "name": "Pioneer Valley",
+    "short_name": "PV",
+    "file": "pv.geojson"
+  },
+  {
+    "id": "wma",
+    "name": "Western Massachusetts",
+    "short_name": "WMA",
+    "file": "wma.geojson"
+  },
+  {
+    "id": "ct",
+    "name": "Connecticut",
+    "short_name": "CT",
+    "file": "ct.geojson"
+  },
+  {
+    "id": "ct-rv",
+    "name": "Connecticut River Valley",
+    "short_name": "CT-RV",
+    "file": "ct-rv.geojson"
+  },
+  {
+    "id": "ri",
+    "name": "Rhode Island",
+    "short_name": "RI",
+    "file": "ri.geojson"
+  },
+  {
+    "id": "msv",
+    "name": "Sullivan County / MSV",
+    "short_name": "MSV",
+    "file": "msv.geojson"
+  },
+  {
+    "id": "eny",
+    "name": "Eastern New York",
+    "short_name": "ENY",
+    "file": "eny.geojson"
+  },
+  {
+    "id": "nyc",
+    "name": "New York City / Lower Hudson",
+    "short_name": "NYC",
+    "file": "nyc.geojson"
+  },
+  {
+    "id": "hv",
+    "name": "Hudson Valley",
+    "short_name": "HV",
+    "file": "hv.geojson"
+  },
+  {
+    "id": "alb",
+    "name": "Albany / Capital Region",
+    "short_name": "ALB",
+    "file": "alb.geojson"
+  },
+  {
+    "id": "mv",
+    "name": "Mohawk Valley",
+    "short_name": "MV",
+    "file": "mv.geojson"
+  }
+]

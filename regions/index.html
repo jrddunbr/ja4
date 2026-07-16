@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MeshCore Regions</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIINfQorGC6w5t2EWPMKdbTNOSpR4T9zD9M="
+    crossorigin=""
+  >
+  <style>
+    .leaflet-pane,
+    .leaflet-tile,
+    .leaflet-marker-icon,
+    .leaflet-marker-shadow,
+    .leaflet-tile-container,
+    .leaflet-pane > svg,
+    .leaflet-pane > canvas,
+    .leaflet-zoom-box,
+    .leaflet-image-layer,
+    .leaflet-layer {
+      left: 0;
+      position: absolute;
+      top: 0;
+    }
+
+    .leaflet-container {
+      background: #d8e2e8;
+      overflow: hidden;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .leaflet-map-pane {
+      z-index: 400;
+    }
+
+    .leaflet-tile-pane {
+      z-index: 200;
+    }
+
+    .leaflet-overlay-pane {
+      z-index: 400;
+    }
+
+    .leaflet-shadow-pane {
+      z-index: 500;
+    }
+
+    .leaflet-marker-pane {
+      z-index: 600;
+    }
+
+    .leaflet-tooltip-pane {
+      z-index: 650;
+    }
+
+    .leaflet-popup-pane {
+      z-index: 700;
+    }
+
+    .leaflet-tile,
+    .leaflet-marker-icon,
+    .leaflet-marker-shadow {
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .leaflet-tile {
+      filter: inherit;
+      visibility: hidden;
+    }
+
+    .leaflet-tile-loaded {
+      visibility: inherit;
+    }
+
+    .leaflet-zoom-animated {
+      transform-origin: 0 0;
+    }
+
+    .leaflet-interactive {
+      cursor: pointer;
+    }
+
+    .leaflet-control {
+      clear: both;
+      float: left;
+      pointer-events: auto;
+      position: relative;
+      z-index: 800;
+    }
+
+    .leaflet-top,
+    .leaflet-bottom {
+      pointer-events: none;
+      position: absolute;
+      z-index: 1000;
+    }
+
+    .leaflet-top {
+      top: 0;
+    }
+
+    .leaflet-right {
+      right: 0;
+    }
+
+    .leaflet-bottom {
+      bottom: 0;
+    }
+
+    .leaflet-left {
+      left: 0;
+    }
+
+    .leaflet-top .leaflet-control {
+      margin-top: 10px;
+    }
+
+    .leaflet-bottom .leaflet-control {
+      margin-bottom: 10px;
+    }
+
+    .leaflet-left .leaflet-control {
+      margin-left: 10px;
+    }
+
+    .leaflet-right .leaflet-control {
+      float: right;
+      margin-right: 10px;
+    }
+
+    .leaflet-control-layers,
+    .leaflet-bar {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+    }
+
+    .leaflet-bar a {
+      background: #fff;
+      border-bottom: 1px solid #ccc;
+      color: #000;
+      display: block;
+      font: bold 18px/26px Arial, Helvetica, sans-serif;
+      height: 26px;
+      text-align: center;
+      text-decoration: none;
+      width: 26px;
+    }
+
+    .leaflet-control-layers {
+      padding: 6px 8px;
+    }
+
+    .leaflet-control-layers label {
+      display: block;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .leaflet-popup {
+      margin-bottom: 20px;
+      position: absolute;
+      text-align: center;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+      padding: 1px;
+      text-align: left;
+    }
+
+    .leaflet-popup-content {
+      line-height: 1.3;
+      margin: 13px 19px;
+    }
+
+    html,
+    body,
+    #map {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .title {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 6px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+      color: #16202a;
+      line-height: 1.35;
+      padding: 10px 12px;
+    }
+
+    .title h1 {
+      font-size: 16px;
+      margin: 0 0 2px;
+    }
+
+    .title p {
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .legend {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 6px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+      color: #16202a;
+      max-height: min(52vh, 420px);
+      overflow: auto;
+      padding: 10px 12px;
+    }
+
+    .legend h2 {
+      font-size: 13px;
+      margin: 0 0 8px;
+    }
+
+    .legend-row {
+      align-items: center;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 18px 1fr;
+      font-size: 12px;
+      margin: 5px 0;
+      white-space: nowrap;
+    }
+
+    .swatch {
+      border: 2px solid currentColor;
+      border-radius: 3px;
+      height: 12px;
+      opacity: 0.85;
+      width: 14px;
+    }
+
+    .popup-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .popup-table {
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .popup-table th {
+      color: #536271;
+      font-weight: 600;
+      padding: 2px 8px 2px 0;
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .popup-table td {
+      padding: 2px 0;
+      vertical-align: top;
+    }
+
+    .region-list {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0;
+    }
+
+    .region-list li {
+      align-items: center;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 16px 1fr;
+      margin: 5px 0;
+    }
+
+    .region-list strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .region-list span {
+      color: #536271;
+      display: block;
+      font-size: 12px;
+    }
+
+    .error {
+      background: #fff3f0;
+      border-left: 4px solid #c8372d;
+      color: #43120e;
+      font-size: 14px;
+      left: 50%;
+      max-width: 560px;
+      padding: 12px 14px;
+      position: fixed;
+      top: 16px;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script>
+    const palette = [
+      "#0f766e",
+      "#b91c1c",
+      "#1d4ed8",
+      "#b45309",
+      "#6d28d9",
+      "#047857",
+      "#be123c",
+      "#0369a1",
+      "#a16207",
+      "#7e22ce",
+      "#15803d",
+      "#c2410c",
+      "#334155"
+    ];
+    const regionColors = new Map();
+
+    function colorFor(id) {
+      if (id === "east") {
+        return "#4b5563";
+      }
+      return regionColors.get(id) || "#111827";
+    }
+
+    function regionId(properties, fallback = "") {
+      return properties.id || properties.index || fallback;
+    }
+
+    const map = L.map("map").setView([42.8, -72.2], 7);
+    const loadedRegionFeatures = [];
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    const title = L.control({ position: "topleft" });
+    title.onAdd = () => {
+      const div = L.DomUtil.create("div", "title");
+      div.innerHTML = "<h1>MeshCore Regions</h1><p>Generated GeoJSON over OpenStreetMap</p>";
+      return div;
+    };
+    title.addTo(map);
+
+    const overlayControl = L.control.layers(null, null, {
+      collapsed: false,
+      sortLayers: true
+    }).addTo(map);
+
+    const legend = L.control({ position: "bottomright" });
+    legend.onAdd = () => {
+      const div = L.DomUtil.create("div", "legend");
+      div.innerHTML = "<h2>Regions</h2><div id=\"legendRows\"></div>";
+      return div;
+    };
+    legend.addTo(map);
+
+    function featureStyle(feature) {
+      const id = regionId(feature.properties);
+      const color = colorFor(id || "");
+      return {
+        color,
+        fillColor: color,
+        fillOpacity: id === "east" ? 0.05 : 0.18,
+        opacity: id === "east" ? 0.7 : 0.95,
+        weight: id === "east" ? 2 : 3
+      };
+    }
+
+    function showError(message) {
+      const div = document.createElement("div");
+      div.className = "error";
+      div.textContent = message;
+      document.body.appendChild(div);
+    }
+
+    function fetchJson(url) {
+      return fetch(url).then((response) => {
+        if (!response.ok) {
+          throw new Error(`${url}: HTTP ${response.status}`);
+        }
+        return response.json();
+      });
+    }
+
+    function pointOnSegment(point, a, b) {
+      const lengthSquared = (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2;
+      if (lengthSquared === 0) {
+        return Math.abs(point[0] - a[0]) < 1e-10 && Math.abs(point[1] - a[1]) < 1e-10;
+      }
+      const cross = (point[1] - a[1]) * (b[0] - a[0]) - (point[0] - a[0]) * (b[1] - a[1]);
+      if (Math.abs(cross) > 1e-10) {
+        return false;
+      }
+      const dot = (point[0] - a[0]) * (b[0] - a[0]) + (point[1] - a[1]) * (b[1] - a[1]);
+      if (dot < 0) {
+        return false;
+      }
+      return dot <= lengthSquared;
+    }
+
+    function pointInRing(point, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const a = ring[i];
+        const b = ring[j];
+        if (pointOnSegment(point, a, b)) {
+          return true;
+        }
+        const intersects = ((a[1] > point[1]) !== (b[1] > point[1]))
+          && (point[0] < ((b[0] - a[0]) * (point[1] - a[1])) / (b[1] - a[1]) + a[0]);
+        if (intersects) {
+          inside = !inside;
+        }
+      }
+      return inside;
+    }
+
+    function pointInPolygon(point, polygon) {
+      if (!polygon.length || !pointInRing(point, polygon[0])) {
+        return false;
+      }
+      return !polygon.slice(1).some((hole) => pointInRing(point, hole));
+    }
+
+    function pointInGeometry(point, geometry) {
+      if (!geometry) {
+        return false;
+      }
+      if (geometry.type === "Polygon") {
+        return pointInPolygon(point, geometry.coordinates);
+      }
+      if (geometry.type === "MultiPolygon") {
+        return geometry.coordinates.some((polygon) => pointInPolygon(point, polygon));
+      }
+      if (geometry.type === "GeometryCollection") {
+        return geometry.geometries.some((child) => pointInGeometry(point, child));
+      }
+      return false;
+    }
+
+    function formatCoordinate(value) {
+      return Number(value).toFixed(6);
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function locationLabel(address) {
+      if (!address) {
+        return "";
+      }
+      const town = address.city
+        || address.town
+        || address.village
+        || address.hamlet
+        || address.municipality
+        || address.suburb
+        || address.neighbourhood;
+      const county = address.county;
+      const state = address.state_code || address.state;
+      return [town, county, state].filter(Boolean).join(", ");
+    }
+
+    function reverseGeocode(latlng) {
+      const params = new URLSearchParams({
+        format: "jsonv2",
+        lat: latlng.lat,
+        lon: latlng.lng,
+        zoom: "18",
+        addressdetails: "1",
+      });
+      return fetchJson(`https://nominatim.openstreetmap.org/reverse?${params}`)
+        .then((data) => locationLabel(data.address) || data.display_name || "");
+    }
+
+    function regionListPopup(latlng, matches, place = "Looking up...") {
+      const coordinate = `${formatCoordinate(latlng.lat)}, ${formatCoordinate(latlng.lng)}`;
+      const placeRow = `<tr><th>Place</th><td>${escapeHtml(place)}</td></tr>`;
+      if (!matches.length) {
+        return `
+          <div class="popup-title">No MeshCore region</div>
+          <table class="popup-table">
+            <tr><th>GPS</th><td>${coordinate}</td></tr>
+            ${placeRow}
+          </table>
+        `;
+      }
+
+      return `
+        <div class="popup-title">${matches.length} MeshCore region${matches.length === 1 ? "" : "s"}</div>
+        <table class="popup-table">
+          <tr><th>GPS</th><td>${coordinate}</td></tr>
+          ${placeRow}
+        </table>
+        <ul class="region-list">
+          ${matches.map((props) => {
+            const id = regionId(props);
+            const color = colorFor(id);
+            return `
+              <li>
+                <span class="swatch" style="color: ${color}; background: ${color}33"></span>
+                <div>
+                  <strong>${props.short_name} - ${props.name}</strong>
+                  <span>${props.kind}${props.parent_region ? `, parent: ${props.parent_region}` : ""}</span>
+                </div>
+              </li>
+            `;
+          }).join("")}
+        </ul>
+      `;
+    }
+
+    function queryRegionsAt(latlng) {
+      const point = [latlng.lng, latlng.lat];
+      return loadedRegionFeatures
+        .filter((feature) => pointInGeometry(point, feature.geometry))
+        .map((feature) => feature.properties)
+        .sort((a, b) => {
+          if (regionId(a) === "east") return 1;
+          if (regionId(b) === "east") return -1;
+          return String(a.short_name).localeCompare(String(b.short_name));
+        });
+    }
+
+    map.on("click", (event) => {
+      const matches = queryRegionsAt(event.latlng);
+      const popup = L.popup({ maxWidth: 420 })
+        .setLatLng(event.latlng)
+        .setContent(regionListPopup(event.latlng, matches))
+        .openOn(map);
+
+      reverseGeocode(event.latlng)
+        .then((place) => {
+          if (map.hasLayer(popup)) {
+            popup.setContent(regionListPopup(event.latlng, matches, place || "Unknown"));
+          }
+        })
+        .catch(() => {
+          if (map.hasLayer(popup)) {
+            popup.setContent(regionListPopup(event.latlng, matches, "Unavailable"));
+          }
+        });
+    });
+
+    fetchJson("index.json")
+      .then((index) => {
+        if (!Array.isArray(index)) {
+          throw new Error("index.json must contain an array");
+        }
+        index.forEach((entry, indexPosition) => {
+          if (entry.id !== "east") {
+            regionColors.set(entry.id, palette[indexPosition % palette.length]);
+          }
+        });
+        return Promise.all(index.map((entry) => {
+          if (!entry.file) {
+            throw new Error("Every index entry must include a file property");
+          }
+          return fetchJson(entry.file).then((data) => ({
+            entry,
+            data
+          }));
+        }));
+      })
+      .then((response) => {
+        const bounds = L.latLngBounds();
+        const legendRows = document.getElementById("legendRows");
+
+        response.forEach(({ entry, data }) => {
+          (data.features || []).forEach((feature) => {
+            feature.properties = {
+              ...entry,
+              ...(feature.properties || {}),
+              id: regionId(feature.properties || {}, entry.id),
+            };
+          });
+          loadedRegionFeatures.push(...(data.features || []));
+          const layer = L.geoJSON(data, {
+            interactive: false,
+            style: featureStyle,
+          });
+
+          const props = data.features?.[0]?.properties || entry;
+          const id = regionId(props, entry.id);
+          const color = colorFor(id);
+          overlayControl.addOverlay(layer, `${props.short_name} - ${props.name}`);
+          layer.addTo(map);
+          bounds.extend(layer.getBounds());
+
+          const row = document.createElement("div");
+          row.className = "legend-row";
+          row.innerHTML = `
+            <span class="swatch" style="color: ${color}; background: ${color}33"></span>
+            <span>${props.short_name} - ${props.name}</span>
+          `;
+          legendRows.appendChild(row);
+        });
+
+        if (bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [24, 24] });
+        }
+      })
+      .catch((error) => {
+        showError(`Could not load the GeoJSON manifest or region files: ${error.message}. Serve this folder over HTTP instead of opening the HTML file directly.`);
+      });
+  </script>
+</body>
+</html>
