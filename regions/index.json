@@ -1,98 +1,114 @@
 [
   {
     "id": "east",
-    "name": "East",
+    "name": "East Coast Region",
     "short_name": "EAST",
+    "region_type": "East Coast Region",
     "file": "east.geojson"
   },
   {
     "id": "me",
     "name": "Maine",
     "short_name": "ME",
+    "region_type": "State Region",
     "file": "me.geojson"
   },
   {
     "id": "nh",
     "name": "New Hampshire",
     "short_name": "NH",
+    "region_type": "State Region",
     "file": "nh.geojson"
   },
   {
     "id": "vt",
     "name": "Vermont",
     "short_name": "VT",
+    "region_type": "State Region",
     "file": "vt.geojson"
   },
   {
     "id": "bos",
     "name": "Boston / Eastern Massachusetts",
     "short_name": "BOS",
+    "region_type": "Metro Region",
     "file": "bos.geojson"
   },
   {
     "id": "pv",
     "name": "Pioneer Valley",
     "short_name": "PV",
+    "region_type": "Regional",
     "file": "pv.geojson"
   },
   {
     "id": "wma",
     "name": "Western Massachusetts",
     "short_name": "WMA",
+    "region_type": "Regional",
     "file": "wma.geojson"
   },
   {
     "id": "ct",
     "name": "Connecticut",
     "short_name": "CT",
+    "region_type": "State Region",
     "file": "ct.geojson"
   },
   {
     "id": "ct-rv",
     "name": "Connecticut River Valley",
     "short_name": "CT-RV",
+    "region_type": "Corridor",
     "file": "ct-rv.geojson"
   },
   {
     "id": "ri",
     "name": "Rhode Island",
     "short_name": "RI",
+    "region_type": "State Region",
     "file": "ri.geojson"
   },
   {
     "id": "msv",
     "name": "Sullivan County / MSV",
     "short_name": "MSV",
+    "region_type": "Adjacent Region - County",
     "file": "msv.geojson"
   },
   {
     "id": "eny",
     "name": "Eastern New York",
     "short_name": "ENY",
+    "region_type": "Adjacent Region - Corridor",
     "file": "eny.geojson"
   },
   {
     "id": "nyc",
     "name": "New York City / Lower Hudson",
     "short_name": "NYC",
+    "region_type": "Adjacent Region - Metro",
     "file": "nyc.geojson"
   },
   {
     "id": "hv",
     "name": "Hudson Valley",
     "short_name": "HV",
+    "region_type": "Adjacent Region - Corridor",
     "file": "hv.geojson"
   },
   {
     "id": "alb",
     "name": "Albany / Capital Region",
     "short_name": "ALB",
+    "region_type": "Adjacent Region - Metro",
     "file": "alb.geojson"
   },
   {
     "id": "mv",
     "name": "Mohawk Valley",
     "short_name": "MV",
+    "region_type": "Adjacent Region - Corridor",
     "file": "mv.geojson"
   }
 ]
