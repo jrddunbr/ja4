@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="DBRX — a 7 1/4 inch gauge railroad.">
+  <title>DBRX — 7 1/4&quot; Railroad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .model-panel { position: relative; overflow: hidden; }
+    .model-panel[hidden] { display: none; }
+    .railcar-card { cursor: pointer; }
+    .visit { grid-template-columns: minmax(0, 1fr) minmax(0, .78fr); }
+    .visit-photo { width: 100%; min-width: 0; max-width: 100%; justify-self: stretch; }
+    .visit-photo img { max-width: 100%; }
+    @media (max-width: 720px) {
+      .visit { grid-template-columns: 1fr; }
+      .visit-photo { width: 100%; }
+      .hero-media::after { background: rgba(9, 43, 88, .87); }
+    }
+    .model-placeholder[hidden] { display: none; }
+    .splat-viewer { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .splat-viewer:empty { display: none; }
+    .splat-viewer canvas { display: block; width: 100% !important; height: 100% !important; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="#" aria-label="DBRX home"><img src="assets/dbrx-logo.png" alt="DBRX — It gets there"></a>
+    <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav">Menu <span></span></button>
+    <nav id="site-nav" aria-label="Primary navigation">
+      <a href="#roster">Roster</a>
+      <a href="#railroad">The Railroad</a>
+      <a href="#visit">Visit</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="DBRX railroad">
+      <div class="hero-media">
+        <img src="assets/photos/IMG_8403.JPEG" alt="DBRX 1450 leads a train of flatcars around a curve">
+      </div>
+      <div class="hero-content">
+        <p class="eyebrow">7 1/4 INCH GAUGE · EST. 2023</p>
+        <h1>Small gauge.<br>Full railroad.</h1>
+        <p class="hero-copy">A 7 1/4" gauge railroad with a strong roster, based in Southern New England.</p>
+        <a class="button button-light" href="#roster">Meet the fleet <span>↘</span></a>
+      </div>
+      <p class="hero-caption">DBRX 1450 leading the work train</p>
+    </section>
+
+    <section class="intro section" id="railroad">
+      <p class="eyebrow">ABOUT THE LINE</p>
+      <div class="intro-grid">
+        <h2>Built to be <em>used.</em></h2>
+        <div>
+          <p>DBRX is a privately operated 7 1/4 inch gauge railroad. Its equipment is maintained as a working fleet, from the locomotives that lead the train to the cars that make an afternoon ride feel like a proper excursion.</p>
+          <a class="text-link" href="#visit">Learn about the railroad <span>→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="roster section" id="roster">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">THE ROLLING STOCK</p>
+          <h2>Our <em>roster.</em></h2>
+        </div>
+        <p class="section-note">Select a car to see its particulars and 3D model.</p>
+      </div>
+      <div class="roster-grid">
+        <article class="railcar-card featured">
+          <div class="card-photo"><img src="assets/photos/IMG_8403.JPEG" alt="DBRX 1450 on the line"></div>
+          <div class="card-body">
+            <p class="card-number">LOCOMOTIVE</p>
+            <h3>DBRX 1450</h3>
+            <p class="card-description">The blue road locomotive and everyday power on DBRX.</p>
+            <button class="detail-button" data-car="dbrx1450">View details <span>↗</span></button>
+          </div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo"><img src="assets/photos/IMG_8377.JPEG" alt="DBRX 1403 and 1404 flatcars"></div>
+          <div class="card-body">
+            <p class="card-number">FLATCAR</p>
+            <h3>DBRX 1403</h3>
+            <p class="card-description">A wood-deck flatcar in DBRX red, white, and blue.</p>
+            <button class="detail-button" data-car="flatcar1403">View details <span>↗</span></button>
+          </div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo"><img src="assets/photos/IMG_8359.JPEG" alt="DBRX 1404 wooden flatcar in a train"></div>
+          <div class="card-body">
+            <p class="card-number">WOODEN FLATCAR</p>
+            <h3>DBRX 1404</h3>
+            <p class="card-description">A wood-deck flatcar in DBRX red, white, and blue.</p>
+            <button class="detail-button" data-car="ridingcar1404">View details <span>↗</span></button>
+          </div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo photo-pending"><span>Photo coming soon</span></div>
+          <div class="card-body"><p class="card-number">FLATCAR</p><h3>DBRX 1401</h3><p class="card-description">A DBRX flatcar, ready for train service.</p><button class="detail-button" data-car="flatcar1401">View details <span>↗</span></button></div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo photo-pending"><span>Photo coming soon</span></div>
+          <div class="card-body"><p class="card-number">MOW GONDOLA</p><h3>DBRX 1402</h3><p class="card-description">A maintenance-of-way gondola for the practical work of the railroad.</p><button class="detail-button" data-car="gondola1402">View details <span>↗</span></button></div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo photo-pending"><span>Photo coming soon</span></div>
+          <div class="card-body"><p class="card-number">RIDING CAR</p><h3>DBRX 1405</h3><p class="card-description">A metal riding car fitted with a seat.</p><button class="detail-button" data-car="ridingcar1405">View details <span>↗</span></button></div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo photo-pending"><span>Photo coming soon</span></div>
+          <div class="card-body"><p class="card-number">GONDOLA</p><h3>DBRX 1406</h3><p class="card-description">A black gondola, joining the DBRX roster.</p><button class="detail-button" data-car="gondola1406">View details <span>↗</span></button></div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo photo-pending"><span>Photo coming soon</span></div>
+          <div class="card-body"><p class="card-number">LOCOMOTIVE</p><h3>B&amp;O 1984</h3><p class="card-description">Chessie System power on the DBRX roster.</p><button class="detail-button" data-car="bo1984">View details <span>↗</span></button></div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo photo-pending"><span>Photo coming soon</span></div>
+          <div class="card-body"><p class="card-number">BOXCAR</p><h3>New Haven</h3><p class="card-description">A New Haven boxcar for the freight roster.</p><button class="detail-button" data-car="nhboxcar">View details <span>↗</span></button></div>
+        </article>
+        <article class="railcar-card">
+          <div class="card-photo photo-pending"><span>Photo coming soon</span></div>
+          <div class="card-body"><p class="card-number">CABOOSE</p><h3>Chessie Caboose</h3><p class="card-description">A B&amp;O Chessie System caboose brings up the rear.</p><button class="detail-button" data-car="chessiecaboose">View details <span>↗</span></button></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="numbers section">
+      <p class="eyebrow">BY THE NUMBERS</p>
+      <div class="numbers-grid">
+        <div><strong>7¼<span>″</span></strong><p>track gauge</p></div>
+        <div><strong>10</strong><p>pieces of equipment</p></div>
+        <div><strong>2023</strong><p>established</p></div>
+      </div>
+    </section>
+
+    <section class="gallery section" aria-labelledby="gallery-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">IN THE FIELD</p><h2 id="gallery-title">On the <em>line.</em></h2></div>
+        <p class="section-note">DBRX 1450, 1403, and 1404 on the rails.</p>
+      </div>
+      <div class="photo-grid">
+        <img class="wide" src="assets/photos/IMG_8375.JPEG" alt="DBRX train across a grassy field">
+        <img src="assets/photos/IMG_4371.JPEG" alt="Track passes beneath a timber bridge toward a tunnel">
+        <img src="assets/photos/IMG_8324.JPEG" alt="DBRX 1450 and 1404 at the railroad">
+        <img src="assets/photos/IMG_8359.JPEG" alt="DBRX train with 1403 and 1404">
+        <img src="assets/photos/IMG_8376.JPEG" alt="DBRX train under a blue sky">
+        <img src="assets/photos/IMG_8377.JPEG" alt="Close view of DBRX 1403 and 1404">
+        <img src="assets/photos/IMG_7948.JPEG" alt="DBRX 1403 on a trailer">
+      </div>
+    </section>
+
+    <section class="visit section" id="visit">
+      <div>
+        <p class="eyebrow">A GOOD DAY OUT</p>
+        <h2>The rhythm of a<br><em>railroad day.</em></h2>
+      </div>
+      <div class="visit-photo"><img src="assets/photos/IMG_4371.JPEG" alt="Track passes beneath a timber bridge toward a tunnel"></div>
+      <div class="visit-copy">
+        <p>DBRX does not have a public track to visit. It operates for meets at Pioneer Valley Live Steamers, occiasionally carries freight and MoW traffic at the Mill Brook Railroad, and hosts the Christmas Train at the Mill Brook Railroad every winter.</p>
+        <a class="text-link" href="mailto:dbrx@ja4.org">Get in touch <span>→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="wordmark" href="#"><img src="assets/dbrx-logo.png" alt="DBRX — It gets there"></a>
+    <p>DBRX Railroad<br>7 1/4 inch gauge</p>
+    <p>© 2026 DBRX<br>It gets there.</p>
+  </footer>
+
+  <dialog class="car-dialog" aria-labelledby="dialog-title">
+    <button class="close-dialog" aria-label="Close details">×</button>
+    <div class="model-panel">
+      <div class="model-placeholder">
+        <span class="model-grid"></span>
+        <p>3D MODEL<br>UNAVAILABLE</p>
+      </div>
+      <div class="splat-viewer" aria-label="Interactive 3D model of DBRX 1450"></div>
+    </div>
+    <div class="detail-panel">
+      <p class="eyebrow" id="dialog-type">LOCOMOTIVE</p>
+      <h2 id="dialog-title">DBRX 1450</h2>
+      <p id="dialog-description"></p>
+      <dl id="dialog-specs"></dl>
+    </div>
+  </dialog>
+  <script type="importmap">
+    { "imports": { "three": "./assets/vendor/three.module.js" } }
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
